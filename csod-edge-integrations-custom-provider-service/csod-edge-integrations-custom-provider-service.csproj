@@ -66,6 +66,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AonHewitt.Lib\AonHewitt.Lib.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="nlog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

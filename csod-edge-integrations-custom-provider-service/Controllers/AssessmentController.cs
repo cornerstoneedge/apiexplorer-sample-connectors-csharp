@@ -27,10 +27,23 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
 
         public IActionResult Get()
         {
-            int userId = User.GetUserId();
+            _logger.LogInformation("Get assessment request.");
+            var userId = User.GetUserId();
+            var settings = _settingsRepository.GetSettingsUsingUserId(userId);
 
-            // Populate these with the list of assessments
-            var assessments = new List<AssessmentItem>();
+            List<AssessmentItem> assessments = null;
+
+            try
+            {
+                assessments = JsonConvert.DeserializeObject<List<AssessmentItem>>(settings.Assessments);
+            }
+            catch
+            {
+
+            }
+
+            if (assessments == null)
+                assessments = new List<AssessmentItem>();
 
             return Ok(assessments);
         }
