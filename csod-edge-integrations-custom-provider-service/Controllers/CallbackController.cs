@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using csod_edge_integrations_custom_provider_service.Data;
 using csod_edge_integrations_custom_provider_service.Models;
+using System.IO;
 
 namespace csod_edge_integrations_custom_provider_service.Controllers
 {
@@ -14,9 +15,11 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
     public class CallbackController : Controller
     {
         protected CallbackRepository CallbackRepository;
-        public CallbackController(CallbackRepository callbackRepository)
+        protected SettingsRepository SettingsRepository;
+        public CallbackController(CallbackRepository callbackRepository, SettingsRepository settingsRepository)
         {
             CallbackRepository = callbackRepository;
+            SettingsRepository = settingsRepository;
         }
 
         [Route("api/callback/{id}")]
@@ -24,17 +27,37 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
         public IActionResult CallbackEndpoint(Guid id)
         {
             var callbackFromRepo = CallbackRepository.GetCallbackByGuid(id);
-            if(callbackFromRepo != null)
+            if (callbackFromRepo != null)
             {
                 //maybe delete callbacks that have their limits reached?
                 //or you can choose to retain all callbacks and not do anything
-                if(callbackFromRepo.Limit == 0)
+                if (callbackFromRepo.Limit == 0)
                 {
                     return BadRequest("Callback limit reached!");
                 }
                 //do all your work here
                 //read the request body for data and then act and process on it
                 //finally create a data payload that edge would understand and set it to callbackFromRepo.EdgeCallbackUrl
+                var callbackData = CallbackRepository.GetCallbackByGuid(id);
+                if (callbackData == null)
+                {
+                    return BadRequest();
+                }
+                var settings = SettingsRepository.GetSettingsUsingUserId(callbackData.UserId);
+                if(settings == null){
+                    return BadRequest();
+                }
+                //this can only be used once. Once you read the body content you can no longer rewind and re-read the content
+                //if you need to keep this body content to be consumed elsewhere, you would need to create a middleware to read and write to the request body
+                string body;
+                using (var bodyReader = new StreamReader(HttpContext.Request.Body))
+                {
+                    body = bodyReader.ReadToEnd();
+                }
+                if (string.IsNullOrWhiteSpace(body))
+                {
+                    return BadRequest();
+                }
 
                 //don't modify we're going to decrement the limit by 1
                 CallbackRepository.DecrementCallbackLimit(callbackFromRepo.Id);
