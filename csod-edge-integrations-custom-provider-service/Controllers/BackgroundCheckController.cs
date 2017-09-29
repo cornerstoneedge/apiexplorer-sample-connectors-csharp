@@ -10,6 +10,7 @@ using csod_edge_integrations_custom_provider_service.Middleware;
 using csod_edge_integrations_custom_provider_service.Data;
 using System.Security.Claims;
 using csod_edge_integrations_custom_provider_service.Models;
+using Microsoft.Extensions.Logging;
 
 namespace csod_edge_integrations_custom_provider_service.Controllers
 {
@@ -19,10 +20,14 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
     {
         protected SettingsRepository SettingsRepository;
         protected CallbackRepository CallbackRepository;
-        public BackgroundCheckController(SettingsRepository settingsRepository, CallbackRepository callbackRepository)
+        protected BackgroundCheckDebugRepository DebugRepository;
+        protected ILogger Logger;
+        public BackgroundCheckController(SettingsRepository settingsRepository, CallbackRepository callbackRepository, BackgroundCheckDebugRepository debugRepository, ILogger<BackgroundCheckController> logger)
         {
             SettingsRepository = settingsRepository;
             CallbackRepository = callbackRepository;
+            DebugRepository = debugRepository;
+            Logger = logger;
         }
 
         [Route("api/packages")]
@@ -37,6 +42,10 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
             var settings = SettingsRepository.GetSettingsUsingUserId(userId);
             
 
+            var manager = new FadvManager(settings);
+
+            packages = manager.GetPackages().ToList();
+
             return Ok(packages);
         }
 
@@ -45,11 +54,40 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
         public IActionResult InitiateBackgroundCheck([FromBody]BackgroundCheckRequest request)
         {
             //to do: do the background check and populate the background check response
+            //var packages = new List<BackgroundCheckPackage>();
             var currentUser = this.User.Identity as ClaimsIdentity;
             var userId = int.Parse(currentUser.Claims.First(x => x.Type.Equals("id", StringComparison.CurrentCultureIgnoreCase)).Value);
             var settings = SettingsRepository.GetSettingsUsingUserId(userId);
 
-            return Ok();
+            var manager = new FadvManager(settings, DebugRepository, Logger);
+            var callback = this.GenerateCallback(request.CallbackData, userId, request.CallbackData.CallbackUrl, 100);
+
+            var delimiterIndex = request.SelectedPackageId.IndexOf(";", StringComparison.OrdinalIgnoreCase);
+            var accountId = request.SelectedPackageId.Substring(0, delimiterIndex);
+            var packageId = request.SelectedPackageId.Substring(delimiterIndex + 1);
+
+            var response = manager.InitiateBackgroundCheck(request, callback, accountId, packageId);
+
+            return Ok(response);
+        }
+
+        [Route("api/getreporturl")]
+        [HttpPost]
+        public IActionResult GetReportUrl([FromBody]GetReportUrlRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.ProviderReferenceId)
+                || string.IsNullOrWhiteSpace(request.RecruiterEmail))
+            {
+                return BadRequest();
+            }
+            var currentUser = this.User.Identity as ClaimsIdentity;
+            var userId = int.Parse(currentUser.Claims.First(x => x.Type.Equals("id", StringComparison.CurrentCultureIgnoreCase)).Value);
+            var settings = SettingsRepository.GetSettingsUsingUserId(userId);
+
+            var manager = new FadvManager(settings);
+            var reportUrl = manager.GetReportUrl(request.ProviderReferenceId, request.RecruiterEmail, request.OrderingAccount);
+
+            return Ok(reportUrl);
         }
 
         private Callback GenerateCallback(CallbackData callbackDataFromCsod, int userId, string edgeCallbackUrl, int callbackLimit = 10)
@@ -63,11 +101,11 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
             {
                 throw new Exception("edge callback url cannot be empty string");
             }
-            if(callbackDataFromCsod == null)
+            if (callbackDataFromCsod == null)
             {
                 throw new Exception("callback data is null");
             }
-            if(userId <= 0)
+            if (userId <= 0)
             {
                 throw new Exception("userId cannot be 0 or negative");
             }

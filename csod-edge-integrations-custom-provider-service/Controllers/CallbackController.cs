@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using csod_edge_integrations_custom_provider_service.Data;
 using csod_edge_integrations_custom_provider_service.Models;
 using System.IO;
+using Microsoft.Extensions.Logging;
 
 namespace csod_edge_integrations_custom_provider_service.Controllers
 {
@@ -16,10 +17,14 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
     {
         protected CallbackRepository CallbackRepository;
         protected SettingsRepository SettingsRepository;
-        public CallbackController(CallbackRepository callbackRepository, SettingsRepository settingsRepository)
+        protected BackgroundCheckDebugRepository DebugRepository;
+        protected ILogger Logger;
+        public CallbackController(CallbackRepository callbackRepository, SettingsRepository settingsRepository, BackgroundCheckDebugRepository debugRepository, ILogger<CallbackController> logger)
         {
             CallbackRepository = callbackRepository;
             SettingsRepository = settingsRepository;
+            DebugRepository = debugRepository;
+            Logger = logger;
         }
 
         [Route("api/callback/{id}")]
@@ -47,6 +52,7 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
                 if(settings == null){
                     return BadRequest();
                 }
+                var manager = new FadvManager(settings, DebugRepository, Logger);
                 //this can only be used once. Once you read the body content you can no longer rewind and re-read the content
                 //if you need to keep this body content to be consumed elsewhere, you would need to create a middleware to read and write to the request body
                 string body;
@@ -58,11 +64,17 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
                 {
                     return BadRequest();
                 }
+                //add to debug data
+                var debugData = DebugRepository.GetUsingCallbackGuid(id);
+                if(debugData != null)
+                {
+                    DebugRepository.AddResponseFromFadv(id, body);
+                }                
+
+                manager.ProcessCallback(body, callbackData.CallbackDataFromCsod);
 
                 //don't modify we're going to decrement the limit by 1
                 CallbackRepository.DecrementCallbackLimit(callbackFromRepo.Id);
-
-
 
                 //finally return status 200 to let requestor know we received the request
                 return Ok();
@@ -70,5 +82,8 @@ namespace csod_edge_integrations_custom_provider_service.Controllers
             //returns 400, to tell them that the callback supplied GUID is not in our system
             return BadRequest("Cannot find callback data to process.");
         }
+
+        
+
     }
 }
