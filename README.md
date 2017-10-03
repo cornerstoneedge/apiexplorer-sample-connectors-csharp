@@ -10,11 +10,11 @@ Select the repo that most fits your needs. As of 9/5/2017 we have the following 
 
 **master** - the master branch and is super lightweight, no custom type contracts are loaded in here, just a users page
 
-**assessment-base** - this is the base branch for custom type of assessments, it includes all of master branch's stuff plus the assessment custom type contracts. Use this repo if you're building against a Vendor of type assessments as this will get you up and running quicker
+**assessment-template** - this is the base branch for custom type of assessments, it includes all of master branch's stuff plus the assessment custom type contracts. Use this repo if you're building against a Vendor of type assessments as this will get you up and running quicker
 
 **assessment-aon** - this is the aon branch for custom type assessment. This branch helps you understand what a custom connector would look like and how it would work; in this case we have a working example of aon against custom type assessments
 
-**bgcheck-base** - this is the base branch for custom type of background check, it includes all of master branch's stuff plus the custom background check contracts. Use this repo if you're building against a Vendor of type background check as this will get you up and running quicker
+**bgcheck-template** - this is the base branch for custom type of background check, it includes all of master branch's stuff plus the custom background check contracts. Use this repo if you're building against a Vendor of type background check as this will get you up and running quicker
 
 **bgcheck-fdav** - this is the fadv branch for custom type background check. This branch helps you understrand what a custom connector would look like and how it would work; in this case we have a working example of fadv against custom type background check
 
@@ -24,6 +24,8 @@ Clone repo, and run. Either command line or you can use IISExpress. You will lan
 ASPNET Core MVC + WebAPI + LiteDB (this is an embedded nosql datastore, much like sqlite for sql)
 
 UI is built using Vuejs 2 and Semantic UI CSS (just the css)
+
+This provides a template around creating user accounts, saving credentials, and handling callbacks. In terms of building a connector to Cornerstone we only require that your service adhers to the contract for the specific integration, so these features are added for convenience and to provide an end to end functioning scenerio.
 
 **wwwroot/** - contains all static files, css, js, this is where the frontend code lives
 
