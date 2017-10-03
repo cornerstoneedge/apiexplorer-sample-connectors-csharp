@@ -116,3 +116,23 @@ Here, Sally has selected a package and made a request to start a background chec
 >A few days later, Sally is alerted that the background check is complete and she can view the status. 
 
 Prior to Sally getting the notification that the background check is complete the vendor has sent out a callback to your service endpoint. This callback contains relevant information about the status of the background check as well as the reference ID (Guid) that you sent as part of the background check request to the vendor. You would then take this Guid and look up the associated callback url. This is the callback url to use when sending the response to CSOD Edge. * *Note for some CSOD Edge integrations there needs to be an api secret key that should be sent, this is a case by case basis.* This is where you would then use the callback response from the vendor and formulate it to one that CSOD Edge understands. Then you would make the apprioate call to to that aforementioned CSOD Edge callback url with the background check payload. CSOD Edge receives this payload and updates the status of the background check. Note that for some integrations such as Background Check there could be multiple callbacks. This completes the entire flow of the integration.
+
+# Assessments Dev Guide
+## Summary
+The assessment workflow can be broken down into 2 outbound messages (webhooks) and 1 inbound message (callback). 
+### WebHooks (Outbound)
+The contract for the webhooks can be found in the following location. These are the endpoints expected to be implemented by the developer. At various points of the integration workflow, the Cornerstone will make calls to these endpoints.
+
+https://app.swaggerhub.com/apis/utahiev/Assessment/v1
+#### Get Assessments
+This call is used to get a list of available assessments that can be taken. This is displayed on the UI in the form of a dropdown. The list returned is a simple key value collection.
+#### Initiate Assessment
+This call is used to return a assessment URL that can be given to the target user to complete. The message includes a parameter for which assessment was selected, as well as a tracking id. 
+### Callback (Inbound)
+The contract for the callback can be found at the the following location. This is the expected message format when sending status back to Cornerstone via the CallbackUrl given as part of the InitiateAssessment call.
+
+https://app.swaggerhub.com/apis/utahiev/AssessmentCallback/v1
+#### Update Assessment Status
+When posting results back to Cornerstone, use the callback URL that was provided as part of the intiaite assessment request (you will need to store this). This callback URL already containts the necessary tracking information, which means the payload only needs to consist of the updated score, whether the assessment has been passed/failed, and any details URLs you wish to provide.
+
+
