@@ -10,11 +10,11 @@ Select the repo that most fits your needs. As of 9/5/2017 we have the following 
 
 **master** - the master branch and is super lightweight, no custom type contracts are loaded in here, just a users page
 
-**assessment-base** - this is the base branch for custom type of assessments, it includes all of master branch's stuff plus the assessment custom type contracts. Use this repo if you're building against a Vendor of type assessments as this will get you up and running quicker
+**assessment-template** - this is the base branch for custom type of assessments, it includes all of master branch's stuff plus the assessment custom type contracts. Use this repo if you're building against a Vendor of type assessments as this will get you up and running quicker
 
 **assessment-aon** - this is the aon branch for custom type assessment. This branch helps you understand what a custom connector would look like and how it would work; in this case we have a working example of aon against custom type assessments
 
-**bgcheck-base** - this is the base branch for custom type of background check, it includes all of master branch's stuff plus the custom background check contracts. Use this repo if you're building against a Vendor of type background check as this will get you up and running quicker
+**bgcheck-template** - this is the base branch for custom type of background check, it includes all of master branch's stuff plus the custom background check contracts. Use this repo if you're building against a Vendor of type background check as this will get you up and running quicker
 
 **bgcheck-fdav** - this is the fadv branch for custom type background check. This branch helps you understrand what a custom connector would look like and how it would work; in this case we have a working example of fadv against custom type background check
 
@@ -24,6 +24,8 @@ Clone repo, and run. Either command line or you can use IISExpress. You will lan
 ASPNET Core MVC + WebAPI + LiteDB (this is an embedded nosql datastore, much like sqlite for sql)
 
 UI is built using Vuejs 2 and Semantic UI CSS (just the css)
+
+This provides a template around creating user accounts, saving credentials, and handling callbacks. In terms of building a connector to Cornerstone we only require that your service adhers to the contract for the specific integration, so these features are added for convenience and to provide an end to end functioning scenerio.
 
 **wwwroot/** - contains all static files, css, js, this is where the frontend code lives
 
@@ -114,3 +116,23 @@ Here, Sally has selected a package and made a request to start a background chec
 >A few days later, Sally is alerted that the background check is complete and she can view the status. 
 
 Prior to Sally getting the notification that the background check is complete the vendor has sent out a callback to your service endpoint. This callback contains relevant information about the status of the background check as well as the reference ID (Guid) that you sent as part of the background check request to the vendor. You would then take this Guid and look up the associated callback url. This is the callback url to use when sending the response to CSOD Edge. * *Note for some CSOD Edge integrations there needs to be an api secret key that should be sent, this is a case by case basis.* This is where you would then use the callback response from the vendor and formulate it to one that CSOD Edge understands. Then you would make the apprioate call to to that aforementioned CSOD Edge callback url with the background check payload. CSOD Edge receives this payload and updates the status of the background check. Note that for some integrations such as Background Check there could be multiple callbacks. This completes the entire flow of the integration.
+
+# Assessments Dev Guide
+## Summary
+The assessment workflow can be broken down into 2 outbound messages (webhooks) and 1 inbound message (callback). 
+### WebHooks (Outbound)
+https://app.swaggerhub.com/apis/utahiev/Assessment/v1
+
+The contract for the webhooks can be found in the following location. These are the endpoints expected to be implemented by the developer. At various points of the integration workflow, the Cornerstone will make calls to these endpoints.
+#### Get Assessments
+This call is used to get a list of available assessments that can be taken. This is displayed on the UI in the form of a dropdown. The list returned is a simple key value collection.
+#### Initiate Assessment
+This call is used to return a assessment URL that can be given to the target user to complete. The message includes a parameter for which assessment was selected, as well as a tracking id. 
+### Callback (Inbound)
+https://app.swaggerhub.com/apis/utahiev/AssessmentCallback/v1
+
+The contract for the callback can be found at the the following location. This is the expected message format when sending status back to Cornerstone via the CallbackUrl given as part of the InitiateAssessment call. Please remember to include the x-csod-edge-api-key custom header with the correct key when posting status back to this endpoint.
+#### Update Assessment Status
+When posting results back to Cornerstone, use the callback URL that was provided as part of the intiaite assessment request (you will need to store this). This callback URL already containts the necessary tracking information, which means the payload only needs to consist of the updated score, whether the assessment has been passed/failed, and any details URLs you wish to provide.
+
+
