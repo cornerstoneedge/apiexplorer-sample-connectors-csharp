@@ -132,6 +132,11 @@ This call is used to return a assessment URL that can be given to the target use
 https://app.swaggerhub.com/apis/utahiev/AssessmentCallback/v1
 
 The contract for the callback can be found at the the following location. This is the expected message format when sending status back to Cornerstone via the CallbackUrl given as part of the InitiateAssessment call. Please remember to include the x-csod-edge-api-key custom header with the correct key when posting status back to this endpoint.
+#### Callback API Key
+When posting data to callback endpoints, you must include an API key in your request header. This API key can be found in Integration Center in the configuration section of your integration.
+
+Header: 'x-csod-edge-api-key':{api key for your connector}
+
 #### Update Assessment Status
 When posting results back to Cornerstone, use the callback URL that was provided as part of the intiaite assessment request (you will need to store this). This callback URL already containts the necessary tracking information, which means the payload only needs to consist of the updated score, whether the assessment has been passed/failed, and any details URLs you wish to provide.
 
