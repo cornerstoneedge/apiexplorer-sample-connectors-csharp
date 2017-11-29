@@ -151,7 +151,7 @@ The contract for the webhoooks can be found in the following location. These are
 This call is used to get a list of available background check packages. These values are displayed in the UI when assigning background checks to applicants. The selected value is later used when initiating a background check. The list returned is a simple key value collection.
 ### Initiage Background Check
 This call is used to initiate a background check for a selected applicant. Applicant details as well as the selelect background check package is sent as part of the request body. The expected response is a reference id to track the background check as well as errors if any.
-### Callback (Inbound)
+## Callback (Inbound)
 https://swaggerhub.com/apis/csodedge/Background-Check-Callback/1.0.0
 
 The contract for the callback can be found at the following location. This is the expected message format when sending status back to Cornerstone via the CallbackUrl given as part of the InitiateBackgroundCheck call. Please remember to include the x-csod-edge-api-key custom header with the correct key when posting status back to this endpoint. 
