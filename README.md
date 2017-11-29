@@ -117,22 +117,48 @@ Here, Sally has selected a package and made a request to start a background chec
 
 Prior to Sally getting the notification that the background check is complete the vendor has sent out a callback to your service endpoint. This callback contains relevant information about the status of the background check as well as the reference ID (Guid) that you sent as part of the background check request to the vendor. You would then take this Guid and look up the associated callback url. This is the callback url to use when sending the response to CSOD Edge. * *Note for some CSOD Edge integrations there needs to be an api secret key that should be sent, this is a case by case basis.* This is where you would then use the callback response from the vendor and formulate it to one that CSOD Edge understands. Then you would make the apprioate call to to that aforementioned CSOD Edge callback url with the background check payload. CSOD Edge receives this payload and updates the status of the background check. Note that for some integrations such as Background Check there could be multiple callbacks. This completes the entire flow of the integration.
 
-# Assessments Dev Guide
+# Assessments Guide
 ## Summary
 The assessment workflow can be broken down into 2 outbound messages (webhooks) and 1 inbound message (callback). 
 ### WebHooks (Outbound)
-https://app.swaggerhub.com/apis/utahiev/Assessment/v1
+https://swaggerhub.com/apis/csodedge/Assessment/1.0.0
 
-The contract for the webhooks can be found in the following location. These are the endpoints expected to be implemented by the developer. At various points of the integration workflow, the Cornerstone will make calls to these endpoints.
+The contract for the webhooks can be found in the following location. These are the endpoints expected to be implemented by the developer. At various points of the integration workflow, the Cornerstone application will make calls to these endpoints.
 #### Get Assessments
-This call is used to get a list of available assessments that can be taken. This is displayed on the UI in the form of a dropdown. The list returned is a simple key value collection.
+This call is used to get a list of available assessments that can be taken. This is displayed on the UI in the form of a dropdown. The list returned is a simple key value collection. The selected value is later used when initiating the assessment.
 #### Initiate Assessment
 This call is used to return a assessment URL that can be given to the target user to complete. The message includes a parameter for which assessment was selected, as well as a tracking id. 
 ### Callback (Inbound)
-https://app.swaggerhub.com/apis/utahiev/AssessmentCallback/v1
+https://swaggerhub.com/apis/csodedge/Assessment-Callback/1.0.0
 
 The contract for the callback can be found at the the following location. This is the expected message format when sending status back to Cornerstone via the CallbackUrl given as part of the InitiateAssessment call. Please remember to include the x-csod-edge-api-key custom header with the correct key when posting status back to this endpoint.
+#### Callback API Key
+When posting data to callback endpoints, you must include an API key in your request header. This API key can be found in Integration Center in the configuration section of your integration.
+
+Header: 'x-csod-edge-api-key':{api key for your connector}
+
 #### Update Assessment Status
 When posting results back to Cornerstone, use the callback URL that was provided as part of the intiaite assessment request (you will need to store this). This callback URL already containts the necessary tracking information, which means the payload only needs to consist of the updated score, whether the assessment has been passed/failed, and any details URLs you wish to provide.
 
+# Background Check Guide
+## Summary
+The background check workflow can be broken down in to 2 outbound messages (webhooks) and 1 inbound message (callback).
+## WebHooks (Outbound)
+https://swaggerhub.com/apis/csodedge/Background-Check/1.0.0
 
+The contract for the webhoooks can be found in the following location. These are the endpoints expected to be implemented by the developer. At various points of the integration workflow, the Cornerstone application will make calls to these endpoints.
+### Get Packages
+This call is used to get a list of available background check packages. These values are displayed in the UI when assigning background checks to applicants. The selected value is later used when initiating a background check. The list returned is a simple key value collection.
+### Initiage Background Check
+This call is used to initiate a background check for a selected applicant. Applicant details as well as the selelect background check package is sent as part of the request body. The expected response is a reference id to track the background check as well as errors if any.
+## Callback (Inbound)
+https://swaggerhub.com/apis/csodedge/Background-Check-Callback/1.0.0
+
+The contract for the callback can be found at the following location. This is the expected message format when sending status back to Cornerstone via the CallbackUrl given as part of the InitiateBackgroundCheck call. Please remember to include the x-csod-edge-api-key custom header with the correct key when posting status back to this endpoint. 
+### Callback API Key
+When posting data to callback endpoints, you must include an API key in your request header. This API key can be found in Integration Center in the configuration section of your integration.
+
+Header: 'x-csod-edge-api-key':{api key for your connector}
+
+### Update Background Check Status
+When posting results back to Cornerstone, use the callback URL that was provided as part of the initiate background check request (you will need to store this). This callback URL already contains the ncessary tracking information. This means the payload only needs to consist of the updated status as well as the necessary reference ids for tracking the original request.
