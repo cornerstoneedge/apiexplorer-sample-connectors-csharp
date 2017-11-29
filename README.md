@@ -121,7 +121,7 @@ Prior to Sally getting the notification that the background check is complete th
 ## Summary
 The assessment workflow can be broken down into 2 outbound messages (webhooks) and 1 inbound message (callback). 
 ### WebHooks (Outbound)
-https://app.swaggerhub.com/apis/csodedge/Assessment/1.0.0
+https://swaggerhub.com/apis/csodedge/Assessment/1.0.0
 
 The contract for the webhooks can be found in the following location. These are the endpoints expected to be implemented by the developer. At various points of the integration workflow, the Cornerstone application will make calls to these endpoints.
 #### Get Assessments
@@ -129,7 +129,7 @@ This call is used to get a list of available assessments that can be taken. This
 #### Initiate Assessment
 This call is used to return a assessment URL that can be given to the target user to complete. The message includes a parameter for which assessment was selected, as well as a tracking id. 
 ### Callback (Inbound)
-https://app.swaggerhub.com/apis/csodedge/Assessment-Callback/1.0.0
+https://swaggerhub.com/apis/csodedge/Assessment-Callback/1.0.0
 
 The contract for the callback can be found at the the following location. This is the expected message format when sending status back to Cornerstone via the CallbackUrl given as part of the InitiateAssessment call. Please remember to include the x-csod-edge-api-key custom header with the correct key when posting status back to this endpoint.
 #### Callback API Key
