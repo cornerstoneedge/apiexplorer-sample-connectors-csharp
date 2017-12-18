@@ -142,15 +142,15 @@ When posting results back to Cornerstone, use the callback URL that was provided
 
 # Background Check Guide
 ## Summary
-The background check workflow can be broken down in to 2 outbound messages (webhooks) and 1 inbound message (callback).
+The background check workflow can be broken down in to two outbound messages (webhooks) and one inbound message (callback).
 ## WebHooks (Outbound)
 https://swaggerhub.com/apis/csodedge/Background-Check/1.0.0
 
 The contract for the webhoooks can be found in the following location. These are the endpoints expected to be implemented by the developer. At various points of the integration workflow, the Cornerstone application will make calls to these endpoints.
 ### Get Packages
 This call is used to get a list of available background check packages. These values are displayed in the UI when assigning background checks to applicants. The selected value is later used when initiating a background check. The list returned is a simple key value collection.
-### Initiage Background Check
-This call is used to initiate a background check for a selected applicant. Applicant details as well as the selelect background check package is sent as part of the request body. The expected response is a reference id to track the background check as well as errors if any.
+### Initiate Background Check
+This call is used to initiate a background check for a selected applicant. Applicant details as well as the selected background check package is sent as part of the request body. The expected response is a reference identifier to track the background check as well as errors if any.
 ## Callback (Inbound)
 https://swaggerhub.com/apis/csodedge/Background-Check-Callback/1.0.0
 
@@ -161,4 +161,4 @@ When posting data to callback endpoints, you must include an API key in your req
 Header: 'x-csod-edge-api-key':{api key for your connector}
 
 ### Update Background Check Status
-When posting results back to Cornerstone, use the callback URL that was provided as part of the initiate background check request (you will need to store this). This callback URL already contains the ncessary tracking information. This means the payload only needs to consist of the updated status as well as the necessary reference ids for tracking the original request.
+When posting results back to Cornerstone, use the callback URL that was provided as part of the initiate background check request (you will need to store this). This callback URL already contains the necessary tracking information. This means the payload only needs to consist of the updated status as well as the necessary reference ids for tracking the original request.
