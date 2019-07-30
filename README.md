@@ -1,9 +1,9 @@
 # csod-edge-integrations-custom-provider-service
-This repo is a starter pack for integrating against custom type integrations in Cornerstone Edge. Custom type integrations are integrations which collectively fall under one category such as: background check, payroll, time and attendance, etc. Instead of integrating against every vendor, it is more pragamtic to define a common theme to integration types and implement at the type level. Therefore, background checks will have one well defined integration contract that various background check providers can build against; and the middleware to integrate between the well defined background check contract as defined by Cornerstone Edge and a background check contract as defined by a Vendor is what this repo serves to accomplish, thus the Custom Connector name.
+This repo is a starter pack for integrating with Cornerstone Connectors. Connectors are integrations which collectively fall under one category such as: background check, assessment, job distributioh, virtual instructor led training etc. Instead of integrating against every vendor, it is more pragamtic to define a common theme to integration types and implement at the type level. Therefore, background checks will have one well defined integration contract that various background check providers can build against; and the middleware to integrate between the well defined background check contract as defined by Cornerstone Edge and a background check contract as defined by a Vendor is what this repo serves to accomplish, thus the Connector name.
 
-For those who are savvy and know what they're doing you can simply clone this repo 'master' branch and run it on your local dev machine (currently the configuration is set to work on windows environments, but you can configure it to work in mac and/or linux environments) or an instance in the cloud (aws, azure, google app engine, digital ocean, etc). This repo is built using ASPNET Core. Please read up on aspnet core and get familiar with it if you're new to C#/donetcore.
+You can simply clone this repo 'master' branch and run it on your local dev machine (currently the configuration is set to work on windows environments, but you can configure it to work in mac and/or linux environments) or an instance in the cloud (aws, azure, google app engine, digital ocean, etc). This repo is built using ASPNET Core. Please read up on aspnet core and get familiar with it if you're new to C#/donetcore.
 
-This repo is a baseline for getting started. It includes a rudimentary user page, which allows you to associate a username/password combo (basic auth request) to a class of settings (which is unique per client against a vendor/provider). This repo serves to help speed up your development process and get a jumpstart by doing most of the leg work and setting up the boiler plate code. It also serves to help highlight the concept of Cornerstone Edge Custom Connectors, which is essentially the service that you're building; the middleware that interfaces with a vendor and integrates against a custom type integration as defined by Cornerstone Edge.
+This repo is a baseline for getting started. It includes a rudimentary user page, which allows you to associate a username/password combo (basic auth request) to a class of settings (which is unique per client against a vendor/provider). This repo serves to help speed up your development process and get a jumpstart by doing most of the leg work and setting up the boiler plate code. It also serves to help highlight the concept of Connectors as a integration middlware, which is essentially the service that you're building; the middleware that interfaces with a vendor and integrates against a Connector as defined by Cornerstone.
 
 # Quick Start
 Select the repo that most fits your needs. As of 9/5/2017 we have the following branches that we recommend:
@@ -12,11 +12,11 @@ Select the repo that most fits your needs. As of 9/5/2017 we have the following 
 
 **assessment-template** - this is the base branch for custom type of assessments, it includes all of master branch's stuff plus the assessment custom type contracts. Use this repo if you're building against a Vendor of type assessments as this will get you up and running quicker
 
-**assessment-aon** - this is the aon branch for custom type assessment. This branch helps you understand what a custom connector would look like and how it would work; in this case we have a working example of aon against custom type assessments
+**assessment-aon** - this is the AON branch for custom type assessment. This branch helps you understand what a connector would look like and how it would work; in this case we have a working example of AON against custom type assessments
 
 **bgcheck-template** - this is the base branch for custom type of background check, it includes all of master branch's stuff plus the custom background check contracts. Use this repo if you're building against a Vendor of type background check as this will get you up and running quicker
 
-**bgcheck-fdav** - this is the fadv branch for custom type background check. This branch helps you understrand what a custom connector would look like and how it would work; in this case we have a working example of fadv against custom type background check
+**bgcheck-fdav** - this is the FADV branch for custom type background check. This branch helps you understrand what a custom connector would look like and how it would work; in this case we have a working example of FADV against custom type background check
 
 Clone repo, and run. Either command line or you can use IISExpress. You will land on the Manage Users page, or navigate to it http://localhost:31515/user . This should be a good starting point and help you familiarize yourself with a User which has a username and password and the associated Settings that a user has. By default I added VendorUrl and VendorUserIdForUser as just some dummy settings to help you understand what would/should go into Settings.
 
@@ -31,19 +31,19 @@ This provides a template around creating user accounts, saving credentials, and 
 
 **Controllers/**
   
-  **CallbackController.cs** - This is a WebAPI controller which contains an endpoint for callbacks from a vendor to this service. Callbacks seem to be universal for most vendors so I included it for reference. There is also a private method I created to help you generate a callback record, which is where the callback starts; by you generating a unique ID and then associating it with a record and handing the unique ID off to the vendor to reference on callbacks; this private method to generate callbacks can live anywhere
+  **CallbackController.cs** - This is a WebAPI controller which contains an endpoint for callbacks from a vendor to this service. Callbacks seem to be universal for most vendors so I included it for reference. There is also a private method we created to help you generate a callback record, which is where the callback starts; by you generating a unique ID and then associating it with a record and handing the unique ID off to the vendor to reference on callbacks; this private method to generate callbacks can live anywhere
   
-  **SettingsController.cs** - This is a WebAPI controller which contains operations for settings. You can choose to use this or not. During development I realized that because settings are so closely associated to a user, it made more sense to lump settings during a get user call from the UI
+  **SettingsController.cs** - This is a WebAPI controller which contains operations for settings. You can choose to use this or not. During development we realized that because settings are so closely associated to a user, it made more sense to lump settings during a get user call from the UI
   
   **UserController.cs** - This is a WebAPI controller which contains all the necessary operations for validating user credentials and adding/updating a user
 
 **Data/**
   
-  **CallbackRepository.cs** - This is the repository pattern that sits on top of litedb that specifically operates on callbacks with CRUD operations. You can choose to add more functions that operate on the callback class as you see fit. I currently use dependency injection to spin up an instance of this callback repository, check out Startup.cs and any controller class to see usage.
+  **CallbackRepository.cs** - This is the repository pattern that sits on top of litedb that specifically operates on callbacks with CRUD operations. You can choose to add more functions that operate on the callback class as you see fit. We currently use dependency injection to spin up an instance of this callback repository, check out Startup.cs and any controller class to see usage.
   
-  **SettingsRepository.cs** - This is the repository pattern that sits on top of litedb that specifically operates on settings with CRUD operations. You can choose to add more functions that operate on the settings class as you see fit. I currently use dependency injection to spin up an instance of this settings repository, check out Startup.cs and any controller class to see usage.
+  **SettingsRepository.cs** - This is the repository pattern that sits on top of litedb that specifically operates on settings with CRUD operations. You can choose to add more functions that operate on the settings class as you see fit. We currently use dependency injection to spin up an instance of this settings repository, check out Startup.cs and any controller class to see usage.
   
-  **UserRepository.cs** - This is the repository pattern that sits on top of litedb that specifically operates on users with CRUD operations. You can choose to add more functions that operate on the users class as you see fit. I currently use dependency injection to spin up an instance of this user repository, check out Startup.cs and any controller class to see usage.
+  **UserRepository.cs** - This is the repository pattern that sits on top of litedb that specifically operates on users with CRUD operations. You can choose to add more functions that operate on the users class as you see fit. We currently use dependency injection to spin up an instance of this user repository, check out Startup.cs and any controller class to see usage.
 
 **Middleware/**
   
@@ -87,7 +87,7 @@ This provides a template around creating user accounts, saving credentials, and 
 
 **appsettings.json** - This is your appconfig file in JSON format
  
-  **appsettings.Development.json** - I would use this for development purposes only. If a Config setting you're trying to access isn't in here, dotnet will try to use the non-Development one. The order is if you're in DEV, Development settings superceed the non-Development one.
+  **appsettings.Development.json** - We recommend using this for development purposes only. If a Config setting you're trying to access isn't in here, dotnet will try to use the non-Development one. The order is if you're in DEV, Development settings superceed the non-Development one.
 
 **Program.cs** - entry point to start everything.
 
@@ -104,10 +104,10 @@ This section is dedicated to helping you understand the flow of how an integrati
 >CSOD EDGE makes a request to this service for some information or action => This service receives it and then makes a request out to the vendor => which sends back a response => which is then operated on and piped as a response back to CSOD EDGE
 
 ### more detailed breakdown of the flow
-I am going to use Background Check as an example to help you understand the entire process and the separation of concerns from each domain
+We are going to use Background Check as an example to help you understand the entire process and the separation of concerns from each domain
 >Sally is a recruiter. She is going to use Custom Background Check to run a background check on her potential employees. The first thing Sally does is look at a list of available background check packages.
 
-This is where the flow starts. When the user, Sally, requests a list of backgrround checks, CSOD Edge makes a call out to the service endpoint of packages which is implemented by this service against the contract as defined here: https://app.swaggerhub.com/apis/mwangcsod/BackgroundCheck/1.0.0 . **Note that this is specifically for background checks, your integration type might differ** For all requests coming from CSOD Edge you should be validating the username/password that comes in as basic auth in the header of every request. Using this username/password combo you can then retrieve the associated settings. Using the settings you can then make the appropriate request out to the vendor. In this case the request hits the packages endpoint, so you would retrieve the settings, look up the packages endpoint url for the vendor as well as the unique identifier that the vendor has specified for this user/company. You would then use these settings and make a request out to the vendor for a list of background check packages. You can then format the vendor response in a way that CSOD Edge understands (as definied by the above contracts) and send it back to CSOD Edge for Sally to view the list of background check packages.
+This is where the flow starts. When the user, Sally, requests a list of backgrround checks, CSOD Edge makes a call out to the service endpoint of packages which is implemented by this service against the contract as defined here: https://app.swaggerhub.com/apis/csodedge/Background-Check/. **Note that this is specifically for background checks, your connector type might differ** For all requests coming from CSOD Edge you should be validating the username/password that comes in as basic auth in the header of every request. Using this username/password combo you can then retrieve the associated settings. Using the settings you can then make the appropriate request out to the vendor. In this case the request hits the packages endpoint, so you would retrieve the settings, look up the packages endpoint url for the vendor as well as the unique identifier that the vendor has specified for this user/company. You would then use these settings and make a request out to the vendor for a list of background check packages. You can then format the vendor response in a way that CSOD Edge understands (as definied by the above contracts) and send it back to CSOD Edge for Sally to view the list of background check packages.
 
 >After viewing the list of background check packages, Sally has decided to run one of the packages on a potential candidate. She selects the package and initiates the request for a background check.
 
@@ -115,13 +115,13 @@ Here, Sally has selected a package and made a request to start a background chec
 
 >A few days later, Sally is alerted that the background check is complete and she can view the status. 
 
-Prior to Sally getting the notification that the background check is complete the vendor has sent out a callback to your service endpoint. This callback contains relevant information about the status of the background check as well as the reference ID (Guid) that you sent as part of the background check request to the vendor. You would then take this Guid and look up the associated callback url. This is the callback url to use when sending the response to CSOD Edge. * *Note for some CSOD Edge integrations there needs to be an api secret key that should be sent, this is a case by case basis.* This is where you would then use the callback response from the vendor and formulate it to one that CSOD Edge understands. Then you would make the apprioate call to to that aforementioned CSOD Edge callback url with the background check payload. CSOD Edge receives this payload and updates the status of the background check. Note that for some integrations such as Background Check there could be multiple callbacks. This completes the entire flow of the integration.
+Prior to Sally getting the notification that the background check is complete the vendor has sent out a callback to your service endpoint. This callback contains relevant information about the status of the background check as well as the reference ID (Guid) that you sent as part of the background check request to the vendor. You would then take this Guid and look up the associated callback url. This is the callback url to use when sending the response to CSOD Edge. * *Note for some CSOD Edge integrations there needs to be an api secret key that should be sent, this is a case by case basis.* This is where you would then use the callback response from the vendor and formulate it to one that CSOD Edge understands. Then you would make the apprioate call to that aforementioned CSOD Edge callback url with the background check payload. CSOD Edge receives this payload and updates the status of the background check. Note that for some integrations such as Background Check there could be multiple callbacks. This completes the entire flow of the integration.
 
 # Assessments Guide
 ## Summary
 The assessment workflow can be broken down into 2 outbound messages (webhooks) and 1 inbound message (callback). 
 ### WebHooks (Outbound)
-https://swaggerhub.com/apis/csodedge/Assessment/1.0.0
+https://swaggerhub.com/apis/csodedge/Assessment/
 
 The contract for the webhooks can be found in the following location. These are the endpoints expected to be implemented by the developer. At various points of the integration workflow, the Cornerstone application will make calls to these endpoints.
 #### Get Assessments
@@ -129,7 +129,7 @@ This call is used to get a list of available assessments that can be taken. This
 #### Initiate Assessment
 This call is used to return a assessment URL that can be given to the target user to complete. The message includes a parameter for which assessment was selected, as well as a tracking id. 
 ### Callback (Inbound)
-https://swaggerhub.com/apis/csodedge/Assessment-Callback/1.0.0
+https://swaggerhub.com/apis/csodedge/Assessment-Callback/
 
 The contract for the callback can be found at the the following location. This is the expected message format when sending status back to Cornerstone via the CallbackUrl given as part of the InitiateAssessment call. Please remember to include the x-csod-edge-api-key custom header with the correct key when posting status back to this endpoint.
 #### Callback API Key
@@ -144,7 +144,7 @@ When posting results back to Cornerstone, use the callback URL that was provided
 ## Summary
 The background check workflow can be broken down in to two outbound messages (webhooks) and one inbound message (callback).
 ## WebHooks (Outbound)
-https://swaggerhub.com/apis/csodedge/Background-Check/1.0.0
+https://swaggerhub.com/apis/csodedge/Background-Check/
 
 The contract for the webhoooks can be found in the following location. These are the endpoints expected to be implemented by the developer. At various points of the integration workflow, the Cornerstone application will make calls to these endpoints.
 ### Get Packages
@@ -152,7 +152,7 @@ This call is used to get a list of available background check packages. These va
 ### Initiate Background Check
 This call is used to initiate a background check for a selected applicant. Applicant details as well as the selected background check package is sent as part of the request body. The expected response is a reference identifier to track the background check as well as errors if any.
 ## Callback (Inbound)
-https://swaggerhub.com/apis/csodedge/Background-Check-Callback/1.0.0
+https://swaggerhub.com/apis/csodedge/Background-Check-Callback/
 
 The contract for the callback can be found at the following location. This is the expected message format when sending status back to Cornerstone via the CallbackUrl given as part of the InitiateBackgroundCheck call. Please remember to include the x-csod-edge-api-key custom header with the correct key when posting status back to this endpoint. 
 ### Callback API Key
